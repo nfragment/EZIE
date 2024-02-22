@@ -5,8 +5,8 @@ import json
 import persist
 
 #settings
-var color_button_off = 0x00FF00
-var color_button_on = 0xff0000
+var color_button_off = 0xff0000
+var color_button_on = 0x00FF00
 var color_fan_speed_bar = 0xc20000
 var lights_timeout = 40 #seconds
 var lights_dim_percentage = 50 #percentage
@@ -78,20 +78,25 @@ def lights_timeout_function()
   leds_right.clear()
   
   if ( lights_dim_percentage != 0 )
-    var r = ((color_button_on >> 16) & 0xff)
-    var g = ((color_button_on >> 8) & 0xff)
-    var b = ((color_button_on) & 0xff)
+    var r_on = ((color_button_on >> 16) & 0xff)
+    var g_on = ((color_button_on >> 8) & 0xff)
+    var b_on = ((color_button_on) & 0xff)
   
+    var r_off = ((color_button_off >> 16) & 0xff)
+    var g_off = ((color_button_off >> 8) & 0xff)
+    var b_off = ((color_button_off) & 0xff)
+
     var factor = 100.0/lights_dim_percentage
   
-    var dimmed_rgb = int(string.replace(format("#%02X%02X%02X", r/factor, g/factor, b/factor), "#", "0x"))
+    var dimmed_on_state = int(string.replace(format("#%02X%02X%02X", r_on/factor, g_on/factor, b_on/factor), "#", "0x"))
+    var dimmed_off_state = int(string.replace(format("#%02X%02X%02X", r_off/factor, g_off/factor, b_off/factor), "#", "0x"))
   
     var power_list = tasmota.get_power()                                        # get a list of booleans with status of each relay
     if size(power_list) > 3
-      power_list.pop(0)? leds_left.set_pixel_color( 3, dimmed_rgb ) : leds_left.set_pixel_color( 3, 0x000000 )
-      power_list.pop(0)? leds_right.set_pixel_color( 1, dimmed_rgb ) : leds_right.set_pixel_color( 1, 0x000000 )
-      power_list.pop(0)? leds_right.set_pixel_color( 0, dimmed_rgb ) : leds_right.set_pixel_color( 0, 0x000000 )
-      power_list.pop(0)? leds_left.set_pixel_color( 0, dimmed_rgb ) : leds_left.set_pixel_color( 0, 0x000000 )
+      power_list.pop(0)? leds_left.set_pixel_color( 3, dimmed_on_state ) : leds_left.set_pixel_color( 3, dimmed_off_state )
+      power_list.pop(0)? leds_right.set_pixel_color( 1, dimmed_on_state ) : leds_right.set_pixel_color( 1, dimmed_off_state )
+      power_list.pop(0)? leds_right.set_pixel_color( 0, dimmed_on_state ) : leds_right.set_pixel_color( 0, dimmed_off_state )
+      power_list.pop(0)? leds_left.set_pixel_color( 0, dimmed_on_state ) : leds_left.set_pixel_color( 0, dimmed_off_state )
     end
   end
   

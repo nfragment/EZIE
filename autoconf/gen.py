@@ -7,14 +7,12 @@ RAW_DIR = './raw' # use this for linux
 # RAW_DIR = '.\\raw' # use this for windows
 packages = defaultdict(list)
 
-print ("starting stage")
+print ("Generating autoconf files")
 
 for board_dir, _, files in os.walk(RAW_DIR):
-    print ("entered for loop")
     if files := [f for f in files if not f.startswith('.')]:
-        print ("executing if block")
-        a, _, arch, board = board_dir.split('/') # use this for linux
         # a, _, arch, board = board_dir.split('\\') # use this for windows
+        a, _, arch, board = board_dir.split('/') # use this for linux
         os.makedirs(arch, exist_ok=True)
         print(f"Compressing {board} for {arch}")
 
@@ -26,9 +24,6 @@ for board_dir, _, files in os.walk(RAW_DIR):
                 myzip.write(filepath, file)
         packages[arch].append(board)
 
-print ("intermediate stage")
 for arch, packages_list in packages.items():
     with open(f"{arch}_manifest.json", "w") as manifest:
         json.dump({"files": sorted(packages_list, key=str.casefold)}, manifest, indent=None, separators=(",", ":"))
-
-print ("final stage")
